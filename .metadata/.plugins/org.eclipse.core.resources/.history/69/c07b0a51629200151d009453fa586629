@@ -1,0 +1,119 @@
+package com.controller.Assignment1;
+
+import com.model.assignment1.ResourceVal;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.bson.Document;
+
+import com.google.gson.Gson;
+import com.model.assignment1.Mongodb_connect;
+import com.model.assignment1.ResourceAtr;
+import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoDatabase;
+
+public class NotifyThread extends Thread{
+	Mongodb_connect db = new Mongodb_connect();
+	MongoClient assignment2Client = new MongoClient();
+	Gson gson = new Gson();
+	MongoDatabase assignment2ClientDb = assignment2Client.getDatabase("assignment2ClientDb");			
+	public void run(){
+		while(true) { 
+			try {
+				sleep(1000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			//FindIterable<Document> iterableObj = null;
+			//FindIterable<Document> iterableObjInstance = null;
+			FindIterable<Document> iterableResource = null;
+			iterableResource = assignment2ClientDb.getCollection("resourceAtr").find(new Document("cancel",0));
+			//iterableObjInstance = assignment2ClientDb.getCollection("objAtr").find(
+			//			new Document("cancel",0));
+			//iterableObj = assignment2ClientDb.getCollection("objInstanceAtr").find(
+			//	new Document("cancel",0));
+			if(iterableResource != null /*|| iterableObj != null || iterableObjInstance != null*/) {
+				for(Document document: iterableResource) {
+					ResourceAtr resourceAtr = gson.fromJson(document.toJson(), ResourceAtr.class);
+					FindIterable<Document> iterableResourceVal = null;
+					iterableResourceVal = assignment2ClientDb.getCollection("resourceVal").find(
+							new Document("objId",resourceAtr.getObjId()).append("objInstanceId", resourceAtr.getObjInstanceId()).append("resourceId", resourceAtr.getResourceId()));
+					if(iterableResourceVal != null) {
+						//while(iterableResourceVal.iterator().hasNext()) {
+							//Document resourceValDoc =  iterableResourceVal.iterator().next();
+						for(Document resourceValDoc : iterableResourceVal){	
+							ResourceVal resourceVal = gson.fromJson(resourceValDoc.toJson(), ResourceVal.class);
+							if((checkIfNotify(resourceVal.getOldResourceValue(),resourceVal.getResourceValue(),resourceVal.getLastChange(),resourceVal.getNotified(), resourceAtr)) == 1 ){
+								int currTime =  (int) (System.currentTimeMillis()/1000);
+								assignment2ClientDb.getCollection("resourceVal").updateOne(new Document("objId", resourceVal.getObjId()).append("objInstanceId", resourceVal.getObjInstanceId()).append("resourceId", resourceVal.getResourceId()),new Document().append("$set", new Document("notified",1)));
+								assignment2ClientDb.getCollection("resourceVal").updateOne(new Document("objId", resourceVal.getObjId()).append("objInstanceId", resourceVal.getObjInstanceId()).append("resourceId", resourceVal.getResourceId()),new Document().append("$set", new Document("lastChange", currTime )));
+								try {
+									notification(resourceVal);
+								} catch (UnsupportedEncodingException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public static void main(String args[]){
+		
+		NotifyThread NT = new NotifyThread();
+		NT.start();
+		
+	}
+		
+	
+	
+	public int checkIfNotify(Integer oldVal, Integer newValue, Integer lastChange,int notified, ResourceAtr resourceAtr ){
+		
+		Integer seconds = (int) (System.currentTimeMillis() / 1000);
+		if(notified == 0 && (newValue > resourceAtr.getGreaterThan() || newValue < resourceAtr.getLessThan() || (Math.abs(oldVal - newValue) > resourceAtr.getStep()))){
+				return(1);
+		} else if(notified == 0 && ((seconds - lastChange) > resourceAtr.getMinPeriod())){
+			return(1);
+		} else if(notified == 1 && ((seconds - lastChange) > resourceAtr.getMaxPeriod())){
+			return(1);
+		} else{
+			return 0;
+		}
+	
+	}
+
+public void notification(ResourceVal resourceVal) throws UnsupportedEncodingException, IOException{
+	
+	final String uriRegister = "http://localhost:8080/CMPE272_Assignment1/notify";
+	
+	HttpClient client = new DefaultHttpClient();
+	HttpPost post = new HttpPost(uriRegister);
+	
+	
+	StringEntity input = new StringEntity( gson.toJson(resourceVal)); // { "clientId":1, "data":"value2"}
+	post.setEntity(input);
+	input.setContentType("application/json");
+
+	HttpResponse response = client.execute(post);
+	BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+	String toString = "";
+	while ((toString = reader.readLine()) != null) {
+		System.out.println("Response from server: "+toString);
+	}
+}
+
+}

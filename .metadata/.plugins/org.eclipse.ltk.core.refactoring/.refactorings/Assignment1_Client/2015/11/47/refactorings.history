@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename local variable &apos;get&apos; in &apos;DeviceInformation.main(...)&apos; to &apos;put&apos;&#x0D;&#x0A;- Original project: &apos;Assignment1_Client&apos;&#x0D;&#x0A;- Original element: &apos;DeviceInformation.main(String[]).get&apos;&#x0D;&#x0A;- Renamed element: &apos;get&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename local variable &apos;get&apos;" id="org.eclipse.jdt.ui.rename.local.variable" input="/src&lt;{DeviceInformation.java[DeviceInformation~main~\[QString;@get!7936!7954!7944!7946!QHttpPut;!0!false" name="put" references="true" stamp="1447725871796" version="1.0"/>
+</session>

@@ -1,0 +1,30 @@
+package com.controller.Assignment1;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.model.assignment1.BootstrapInfo;
+import com.model.assignment1.Mongodb_connect;
+import com.model.assignment1.WeatherInfo;
+
+public class ServerConnectFinal {
+
+	Mongodb_connect db = new Mongodb_connect();
+	
+	@RequestMapping(value = "/weather/{latitude}/{longitude}/{day}/{timeOfDay}", method = RequestMethod.GET)
+	public @ResponseBody WeatherInfo getWeatherInfo(@PathVariable String latitude, String longitude, String day, String timeOfDay ){
+		
+		WeatherInfo wi = new WeatherInfo();
+		wi.setLatitude(latitude);
+		wi.setLongitude(longitude);
+		wi.setDay(day);
+		wi.setTimeOfDay(timeOfDay);
+		
+		return db.getWeatherData(wi);
+		
+	}
+
+
+}

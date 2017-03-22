@@ -1,0 +1,67 @@
+package com.controller.Assignment1;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.model.assignment1.*;
+import com.mongodb.util.JSON;
+
+@Controller
+public class ServerConnect {
+
+	Mongodb_connect db = new Mongodb_connect();
+
+	@RequestMapping(value = "/bootstrap/{clientId}", method = RequestMethod.GET)
+	public @ResponseBody BootstrapInfo serverBootstrapInfo(@PathVariable int clientId ){
+		db.updateFlag(clientId, "Y");
+		return db.getBootstrapInfo(clientId); 
+	}
+
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	public @ResponseBody String registerTheClient(@RequestBody Registration reg){
+		int cid =  reg.getClientId();
+		if(cid == 1){
+			return db.registerOnServer(reg);
+		}
+		else {
+			String flag = db.checkIfBootstrapped(cid);
+		if(flag.equalsIgnoreCase("y")){
+			return db.registerOnServer(reg);
+		}
+		else{
+			return "Client Not Bootstrapped";	
+		}
+	}
+	}
+	@RequestMapping(value = "/update", method = RequestMethod.PUT)
+	public @ResponseBody String updateTheClient(@RequestBody Registration reg){
+		return db.updateOnServer(reg);			
+	}
+
+@RequestMapping(value = "/notify", method = RequestMethod.POST)
+	public @ResponseBody String serverNotification(@RequestBody ResourceVal resourceVal){
+		
+	System.out.println(JSON.serialize(resourceVal));
+	return "Server Notified";
+
+	
+	}	
+	
+
+	@RequestMapping(value = "/delete/{clientId}", method = RequestMethod.DELETE)
+	public @ResponseBody String deleteTheClient(@PathVariable int clientId){
+		return db.deleteFromServer(clientId);			
+	}
+
+
+
+
+}
+
+
+
+
+

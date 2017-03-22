@@ -1,0 +1,10 @@
+package com.controller.Assignment1;
+
+import com.model.assignment1.Mongodb_connect;
+
+public class ServerConnectFinal {
+
+	Mongodb_connect db = new Mongodb_connect();
+
+
+}

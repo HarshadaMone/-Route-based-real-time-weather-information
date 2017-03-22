@@ -1,0 +1,246 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import com.google.gson.Gson;
+
+
+public class DeviceInformation {
+
+public static void main(String[] args) throws IOException{
+		
+		
+		
+		Scanner input1 = new Scanner(System.in);
+		Scanner input2 = new Scanner(System.in);
+		Scanner input3 = new Scanner(System.in);
+		Scanner input4 = new Scanner(System.in);
+		Scanner input5 = new Scanner(System.in);
+	;
+		Gson gson = new Gson();
+		String command;
+		int choice;
+		int InputObjId;
+		int InputObjInstanceId;
+		int InputResourceId;
+		
+		while(true){
+			
+			System.out.println("Enter <Command>");
+			System.out.println("Read");
+			System.out.println("Discover");
+			System.out.println("Write");
+			System.out.println("Write Attributes");
+			System.out.println("Execute");
+			System.out.println("Create");
+			System.out.println("Delete");
+			System.out.println("Observe");
+			System.out.println("Cancel Observation");
+			System.out.println("Enter Exit to close");
+			command = input1.nextLine();
+			if (command.equalsIgnoreCase("Exit")){
+				break;
+			}
+			
+			
+			if(command.equalsIgnoreCase("read")){
+
+					final String uriBootstrap = "http://localhost:8080/CMPE273_Client/management/read/";
+					HttpClient client = new DefaultHttpClient();
+					System.out.println("Enter ObjId/ ObjID & InstanceId/ ObjId & InstanceID & resource Id ");
+					choice = input2.nextInt();
+					HttpGet get = null;
+					if (choice == 1){
+						InputObjId = input3.nextInt();
+						 get = new HttpGet(uriBootstrap+InputObjId);
+					}else if(choice == 2){
+						InputObjId = input3.nextInt();
+						InputObjInstanceId = input4.nextInt();
+						get = new HttpGet(uriBootstrap+InputObjId+"/"+InputObjInstanceId);
+					}else{
+						InputObjId = input3.nextInt();
+						InputObjInstanceId = input4.nextInt();
+						InputResourceId = input5.nextInt();
+						get = new HttpGet(uriBootstrap+InputObjId+"/"+InputObjInstanceId+"/"+InputResourceId);
+					}
+					HttpResponse response = client.execute(get);
+					BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+					String toString = "";
+					String jsonResp = "";
+					while ((toString = reader.readLine()) != null) {
+						jsonResp += toString;
+					}
+					System.out.println(jsonResp);
+					
+
+			} else if(command.equalsIgnoreCase("discover")){
+
+				final String uriBootstrap = "http://localhost:8080/CMPE273_Client/management/discover/";
+				HttpClient client = new DefaultHttpClient();
+				System.out.println("Enter ObjId/ ObjID & InstanceId/ ObjId & InstanceID & resource Id ");
+				choice = input2.nextInt();
+				HttpGet get = null;
+				if (choice == 1){
+					InputObjId = input3.nextInt();
+					 get = new HttpGet(uriBootstrap+InputObjId);
+				}else if(choice == 2){
+					InputObjId = input3.nextInt();
+					InputObjInstanceId = input4.nextInt();
+					get = new HttpGet(uriBootstrap+InputObjId+"/"+InputObjInstanceId);
+				}else{
+					InputObjId = input3.nextInt();
+					InputObjInstanceId = input4.nextInt();
+					InputResourceId = input5.nextInt();
+					get = new HttpGet(uriBootstrap+InputObjId+"/"+InputObjInstanceId+"/"+InputResourceId);
+				}
+				HttpResponse response = client.execute(get);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+				String toString = "";
+				String jsonResp = "";
+				while ((toString = reader.readLine()) != null) {
+					jsonResp += toString;
+				}
+				System.out.println(jsonResp);
+				
+	
+		}else if(command.equalsIgnoreCase("write")){
+			
+			final String uriRegister = "http://localhost:8080/CMPE273_Client/write";
+			
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost(uriRegister);
+			
+			System.out.println("Enter ObjId , InstanceID , resource Id, value ");
+			InputObjId = input2.nextInt();
+			InputObjInstanceId = input3.nextInt();
+			InputResourceId = input4.nextInt();
+			choice = input5.nextInt();
+			
+			ValueDb valueDb = new ValueDb();
+			valueDb.setObjId(InputObjId);
+			valueDb.setObjInstanceId(InputObjInstanceId);
+			valueDb.setResourceId(InputResourceId);
+			valueDb.setValue(choice);
+			
+			StringEntity input = new StringEntity( gson.toJson(valueDb)); // { "clientId":1, "data":"value2"}
+			post.setEntity(input);
+			input.setContentType("application/json");
+
+			HttpResponse response = client.execute(post);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			String toString = "";
+			while ((toString = reader.readLine()) != null) {
+				System.out.println("Response from server: "+toString);
+			}
+		}else if(command.equalsIgnoreCase("write Attributes")){
+
+			final String uriRegister = "http://localhost:8080/CMPE273_Client/writeAtr";
+			
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost(uriRegister);
+			
+			System.out.println("Enter ObjId , InstanceID , resource Id");
+			InputObjId = input2.nextInt();
+			InputObjInstanceId = input3.nextInt();
+			InputResourceId = input4.nextInt();	
+			ResourceAtr resourceAtr = new ResourceAtr();
+			resourceAtr.setObjId(InputObjId);
+			resourceAtr.setObjInstanceId(InputObjInstanceId);
+			resourceAtr.setResourceId(InputResourceId);
+			resourceAtr.setCancel(0);
+			resourceAtr.setGreaterThan(60);
+			resourceAtr.setLessThan(40);
+			resourceAtr.setMaxPeriod(90);
+			resourceAtr.setMinPeriod(50);
+			StringEntity input = new StringEntity( gson.toJson(resourceAtr)); // { "clientId":1, "data":"value2"}
+			post.setEntity(input);
+			input.setContentType("application/json");
+
+			HttpResponse response = client.execute(post);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			String toString = "";
+			while ((toString = reader.readLine()) != null) {
+				System.out.println("Response from server: "+toString);
+			}
+			
+		}
+			
+			/*if(command.equalsIgnoreCase("create")){
+				
+				final String uriRegister = "http://localhost:8080/CMPE272_Assignment1/register";
+				
+				HttpClient client = new DefaultHttpClient();
+				HttpPost post = new HttpPost(uriRegister);
+				
+				ClientData cd = da.getClientData(clientId);
+				if (cd == null){
+					System.out.println("Device not bootstraped, can't register");
+					continue;
+				}
+				StringEntity input = new StringEntity( gson.toJson(cd)); // { "clientId":1, "data":"value2"}
+				post.setEntity(input);
+				input.setContentType("application/json");
+
+				HttpResponse response = client.execute(post);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+				String toString = "";
+				while ((toString = reader.readLine()) != null) {
+					System.out.println("Response from server: "+toString);
+				}
+			}
+			if(command.equalsIgnoreCase("delete")){
+				
+				final String uriRegister = "http://localhost:8080/CMPE272_Assignment1/delete/";
+				
+				HttpClient client = new DefaultHttpClient();
+				HttpDelete delete = new HttpDelete(uriRegister+clientId);
+				HttpResponse response = client.execute(delete);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+				String toString = "";
+				while ((toString = reader.readLine()) != null) {
+					System.out.println("Response from server: "+toString);
+				}
+				da.deleteClientData(clientId);
+			}	
+			if(command.equalsIgnoreCase("update")){
+				
+				final String uriUpdate = "http://localhost:8080/CMPE272_Assignment1/update";
+				
+				HttpClient client = new DefaultHttpClient();
+				HttpPut put = new HttpPut(uriUpdate);
+				
+				ClientData cd = da.getClientData(clientId);
+				if (cd == null){
+					System.out.println("Device not registered, can't update");
+					continue;
+				}
+				cd.setChange(cd.getChange()+1);
+				StringEntity input = new StringEntity( gson.toJson(cd));
+				put.setEntity(input);
+				input.setContentType("application/json");
+
+				HttpResponse response = client.execute(put);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+				String toString = "";
+				while ((toString = reader.readLine()) != null) {
+					System.out.println("Response from server: "+toString);
+				}
+				da.updateClientData(cd);
+			}
+		}
+	
+	
+	*/
+}
+}
+}

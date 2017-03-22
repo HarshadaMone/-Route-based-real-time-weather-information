@@ -1,0 +1,14 @@
+package com.controller.Assignment1;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.model.assignment1.Mongodb_connect;
+
+public class ServerConnectFinal {
+
+	Mongodb_connect db = new Mongodb_connect();
+	
+	@RequestMapping(value = "/weather/{latitude}/{longitude}/{day}/{timeOfDay}", method = RequestMethod.GET)
+
+
+}

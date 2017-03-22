@@ -1,0 +1,11 @@
+package com.model.assignment1;
+
+public class UserBillingInfo {
+
+	private String userName;
+	private Integer noOfReq ;
+	private String start;
+	private String end;
+	private String status;
+	
+}

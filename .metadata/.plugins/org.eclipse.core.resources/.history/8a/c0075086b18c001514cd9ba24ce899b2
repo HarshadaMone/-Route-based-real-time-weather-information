@@ -1,0 +1,45 @@
+package com.controller.Assignment1;
+
+import org.bson.Document;
+
+import com.google.gson.Gson;
+import com.model.assignment1.Mongodb_connect;
+import com.model.assignment1.ResourceAtr;
+import com.model.assignment1.ResourceVal;
+import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoDatabase;
+
+public class NotifyThread extends Thread{
+	Mongodb_connect db = new Mongodb_connect();
+	MongoClient assignment2Client = new MongoClient();
+	Gson gson = new Gson();
+	MongoDatabase assignment2ClientDb = assignment2Client.getDatabase("assignment2ClientDb");			
+	public void run(){
+		
+		FindIterable<Document> iterableObj = null;
+		FindIterable<Document> iterableObjInstance = null;
+		FindIterable<Document> iterableResource = null;
+		iterableResource = assignment2ClientDb.getCollection("resourceAtr").find(
+				new Document("cancel",0));
+		iterableObjInstance = assignment2ClientDb.getCollection("objAtr").find(
+				new Document("cancel",0));
+		iterableObj = assignment2ClientDb.getCollection("objInstanceAtr").find(
+				new Document("cancel",0));
+		if(iterableResource != null || iterableObj != null || iterableObjInstance != null) {
+			for(Document document: iterableResource) {
+				ResourceAtr resourceAtr = gson.fromJson(document.toJson(), ResourceAtr.class);
+				FindIterable<Document> iterableResourceVal = null;
+				iterableResourceVal = assignment2ClientDb.getCollection("resourceVal").find(
+						new Document("objId",resourceAtr.getObjId()).append("objInstanceId", resourceAtr.getObjInstanceId()).append("resourceId", resourceAtr.getResourceId()));
+				ResourceVal resourceVal = gson.fromJson(document.toJson(), ResourceVal.class);
+			
+			
+			}
+		}
+		
+		
+		
+	}
+	
+}

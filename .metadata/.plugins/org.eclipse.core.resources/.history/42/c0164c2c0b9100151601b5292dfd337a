@@ -1,0 +1,35 @@
+package com.model.assignment1;
+import org.bson.Document;
+
+import com.google.gson.Gson;
+import com.mongodb.Block;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+public class DatabaseConnectFinal {
+
+
+	MongoClient mongoServer = new MongoClient();
+	MongoDatabase sensorInfo = mongoServer.getDatabase("sensorInfo");
+	MongoDatabase weatherInfo = mongoServer.getDatabase("weatherInfo");
+	MongoDatabase userInfo = mongoServer.getDatabase("userInfo");
+	MongoDatabase userBillingInfo = mongoServer.getDatabase("userBillingInfo");
+	Gson gson = new Gson();
+	//Map<Integer,String> mapBootstrapInfo = new HashMap<Integer,String>();
+
+	public static void main(String args[]){
+		Mongodb_connect db = new Mongodb_connect();
+		
+	}
+	
+	public void updateWeatherData(WeatherInfo wi){
+		
+	
+		
+	}
+
+
+}	
