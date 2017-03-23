@@ -1,0 +1,27 @@
+Link to Check out the app :
+https://www.dropbox.com/s/51corn5cs4z1cih/Route%20based%20weather.avi?dl=0
+
+The App was originally deployed to AWS,
+http://52.33.113.43:8080/FinalProject281Server
+
+
+APIs Used In Project
+Get directions http://52.33.113.43:8080/FinalProject281Server/weather/map/{userName}/{zipcode}
+Login
+http://52.33.113.43:8080/FinalProject281Server/login
+Graph – city
+http://52.33.113.43:8080/FinalProject281Server/graph/city/{city}
+Graph -  zipcode
+http://52.33.113.43:8080/FinalProject281Server/graph/zipcode/{zipcode}
+On Sensors
+http://52.33.113.43:8080/FinalProject281Server/onSensors/{city}
+Register user
+http://52.33.113.43:8080/FinalProject281Server/register
+{flag : enabled/disabled }users
+http://52.33.113.43:8080/FinalProject281Server /user/{userName}/{flag}
+{status : ON/OFF} sensors
+http://52.33.113.43:8080/FinalProject281Server /sensor/{zipcode}/{status}
+User info
+http://52.33.113.43:8080/FinalProject281Server /userInfo
+User Billing Info
+http://52.33.113.43:8080/FinalProject281Server /userBillingInfo
